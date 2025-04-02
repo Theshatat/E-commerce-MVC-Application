@@ -1,8 +1,17 @@
+using E_commerce.Data;
+using eTickets.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var ConnectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection")
+    ?? throw new InvalidOperationException(message: "No Connection String Was Found");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(ConnectionString));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,5 +34,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+//Seed database
+AppDbInitializer.Seed(app);
 
 app.Run();
